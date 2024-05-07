@@ -1,7 +1,7 @@
 require 'date'
 
 # 年、月を引数で受け取り、その月のカレンダーを表示する関数
-def create_dates_of_month(month=Date.today.month, year=Date.today.year)
+def display_calender_of_month(month=Date.today.month, year=Date.today.year)
   #月の初日と最終日のインスタンスを作成
   first_date_of_month = Date.new(year, month, 1)
   last_date_of_month = Date.new(year, month, -1) #-1日は指定した月の最終日を指す。

@@ -1,4 +1,5 @@
 require 'date'
+require 'optparse'
 
 # 年、月を引数で受け取り、その月のカレンダーを表示する関数
 def display_calender_of_month(month=Date.today.month, year=Date.today.year)
@@ -31,9 +32,40 @@ end
 
 # 以下、メインの処理
 
-# -m, -y オプションの引数を受けとる
+# 月と年をnilで初期化
+month=nil
+year=nil
+
+# コマンドラインに入力されたオプションの引数を受けとる
+opt = OptionParser.new
+params = {}
+
+opt.on('-m, month') {|v| params[:m] = v } # 引数monthを必ず取ることを明示
+opt.on('-y') {|v| params[:y] = v }
+opt.parse!(ARGV)
+
+# オプションの指定の形式が正しいことをチェックして、monthとyearの値を設定する
+# 以下の2通りのUsageで入力を受け付けられるものとする。
+# cal [-y] [[month] year]
+# cal [-m month] [year]
+
+# ARGVの個数で分岐処理
+case ARGV.length
+when 0 then
+  year = nil
+  month = params[:m]
+when 1 then
+  year = ARGV[0]
+  month = params[:m]
+when 2 then
+  month = ARGV[0]
+  year = ARGV[1]
+else
+  printf "Usage: ./cal.rb [-y] [[month] year]\n       ./cal.rb [-m month] [year]"
+end
 
 # オプションの引数が有効かどうか判定する
+
 # 無効な引数が与えられていれば、例外処理を発生させ、プログラムを終了する
 
 # 以下、カレンダーを表示する処理

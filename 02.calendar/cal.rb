@@ -32,45 +32,106 @@ end
 
 # 以下、メインの処理
 
-# 月と年をnilで初期化
-month=nil
-year=nil
-
-# コマンドラインに入力されたオプションの引数を受けとる
+# コマンドラインに入力されたオプションの引数を受けとる処理
 opt = OptionParser.new
 params = {}
 
 opt.on('-m, month') {|v| params[:m] = v } # 引数monthを必ず取ることを明示
-opt.on('-y') {|v| params[:y] = v }
+opt.on('-y') {|v| params[:y] = v } # 引数を取らない
 opt.parse!(ARGV)
 
-# オプションの指定の形式が正しいことをチェックして、monthとyearの値を設定する
+# コマンドラインで指定された月と年の値を格納する変数を準備し、nilで初期化
+input_month=nil
+input_year=nil
+
+# オプションの指定形式に応じて、monthとyearの値を設定する
 # 以下の2通りのUsageで入力を受け付けられるものとする。
 # cal [-y] [[month] year]
 # cal [-m month] [year]
-
-# ARGVの個数で分岐処理
-case ARGV.length
+case ARGV.length # ARGVの要素数(=コマンドライン引数の個数)で分岐処理
 when 0 then
-  year = nil
-  month = params[:m]
+  input_month = params[:m]
+  input_year = nil
 when 1 then
-  year = ARGV[0]
-  month = params[:m]
+  input_month = params[:m]
+  input_year = ARGV[0]
 when 2 then
-  month = ARGV[0]
-  year = ARGV[1]
+  input_month = ARGV[0]
+  input_year = ARGV[1]
 else
-  printf "Usage: ./cal.rb [-y] [[month] year]\n       ./cal.rb [-m month] [year]"
+  printf "Usage: ./cal.rb [-y] [[month] year]\n"
+  printf "       ./cal.rb [-m month] [year]\n"
+  exit
 end
 
-# オプションの引数が有効かどうか判定する
+year = nil
+month = nil
 
-# 無効な引数が与えられていれば、例外処理を発生させ、プログラムを終了する
+# input_yearについてバリデーションチェックをし、問題なければ値をyearに代入
+# 注意：
+# input_monthの値によってyearの値を変化させる機能があるため、
+# input_monthのバリデーションチェックより先に処理すること。
+if !input_year.nil?
+  #有効な形式を表す正規表現とマッチさせる
+  m_y = /^[1-9][0-9]{0,3}$/.match(input_year)
+  if m_y
+    m_y_i = m_y[0].to_i
+    if m_y_i <= 0 || 10000 <= m_y_i
+      puts "year '#{year}' not in range 1..9999"
+      exit
+    else
+      year = input_year.to_i
+    end
+  else
+    puts "not a valid year #{year}"
+    exit
+  end
+end
+
+# input_monthについてバリデーションチェックをし、問題なければ値をmonthに代入
+if !input_month.nil?
+  #有効な形式を表す正規表現とマッチさせる
+  m_m_s = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.match(input_month)
+  m_m_i = /^[1-9]$|^[1][0-2]$/.match(input_month)
+  m_m_f = /^[1-9][f]$|^[1][0-2][f]$/.match(input_month)
+  m_m_p = /^[1-9][p]$|^[1][0-2][p]$/.match(input_month)
+  #アルファベット表記の月と月番号を対応させるハッシュテーブルを準備
+  hash_of_month = {
+    "JAN" => 1, "FEB" => 2, "MAR" => 3, "APR" => 4, "MAY" => 5, "JUN" => 6,
+    "JUL" => 7, "AUG" => 8, "SEP" => 9, "OCT" => 10, "NOV" => 11, "DEC" => 12,
+  }
+  if m_m_s # 英単語フォーマットの場合
+    month = hash_of_month[m_m_s[0].upcase]
+  elsif m_m_i # 数字フォーマットの場合
+    month = m_m_i[0].to_i
+  elsif m_m_f # 末尾にfがあるフォーマットの場合
+    month = m_m_f[0].chop.to_i
+    if year.nil? && month == Date.today.month
+      year = Date.today.year + 1 # 今日の日付よりyearを1だけ進める
+    end
+  elsif m_m_p # 末尾にpがあるフォーマットの場合
+    month = m_m_p[0].chop.to_i
+    year = Date.today.year - 1 # 今日の日付よりyearを1だけさかのぼる
+  else
+    puts("#{input_month} is neither a month number (1..12) nor a name")
+    exit
+  end
+end
 
 # 以下、カレンダーを表示する処理
-# month、yearがどちらも未指定なら、今月のカレンダーを表示
-display_calender_of_month()
-# monthが未指定で、yearが指定されていれば、「１年分のカレンダーを表示する機能は未実装です。」と表示する
-
-# monthが指定されていれば、当該月のカレンダーを表示
+if error_flag == false
+  if !year.nil?
+    if !month.nil?
+      display_calender_of_month(month, year)
+    else
+      puts("一年分のカレンダーを表示する機能は未実装です。")
+      exit
+    end
+  else
+    if !month.nil?
+      display_calender_of_month(month, Date.today.year)
+    else
+      display_calender_of_month(Date.today.month, Date.today.year)
+    end
+  end
+end

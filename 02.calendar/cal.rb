@@ -28,3 +28,17 @@ def display_calender_of_month(month=Date.today.month, year=Date.today.year)
   # 最後に改行を出力
   print("\n")
 end
+
+# 以下、メインの処理
+
+# -m, -y オプションの引数を受けとる
+
+# オプションの引数が有効かどうか判定する
+# 無効な引数が与えられていれば、例外処理を発生させ、プログラムを終了する
+
+# 以下、カレンダーを表示する処理
+# month、yearがどちらも未指定なら、今月のカレンダーを表示
+display_calender_of_month()
+# monthが未指定で、yearが指定されていれば、「１年分のカレンダーを表示する機能は未実装です。」と表示する
+
+# monthが指定されていれば、当該月のカレンダーを表示

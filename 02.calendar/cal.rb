@@ -75,17 +75,17 @@ month = nil
 # input_monthのバリデーションチェックより先に処理すること。
 if !input_year.nil?
   #有効な形式を表す正規表現とマッチさせる
-  m_y = /^[1-9][0-9]{0,3}$/.match(input_year)
+  m_y = /^[1-9][0-9]{0,}$/.match(input_year)
   if m_y
     m_y_i = m_y[0].to_i
     if m_y_i <= 0 || 10000 <= m_y_i
-      puts "year '#{year}' not in range 1..9999"
+      puts "year '#{input_year}' not in range 1..9999"
       exit
     else
       year = input_year.to_i
     end
   else
-    puts "not a valid year #{year}"
+    puts "not a valid year #{input_year}"
     exit
   end
 end
@@ -121,19 +121,17 @@ if !input_month.nil?
 end
 
 # 以下、カレンダーを表示する処理
-if error_flag == false
-  if !year.nil?
-    if !month.nil?
-      display_calender_of_month(month, year)
-    else
-      puts("一年分のカレンダーを表示する機能は未実装です。")
-      exit
-    end
+if !year.nil?
+  if !month.nil?
+    display_calender_of_month(month, year)
   else
-    if !month.nil?
-      display_calender_of_month(month, Date.today.year)
-    else
-      display_calender_of_month(Date.today.month, Date.today.year)
-    end
+    puts("一年分のカレンダーを表示する機能は未実装です。")
+    exit
+  end
+else
+  if !month.nil?
+    display_calender_of_month(month, Date.today.year)
+  else
+    display_calender_of_month(Date.today.month, Date.today.year)
   end
 end

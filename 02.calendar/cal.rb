@@ -20,7 +20,16 @@ def display_calender_of_month(month=Date.today.month, year=Date.today.year)
   # 日付けをヘッダに続けて成形して出力
   for day in Range.new(1, last_date_of_month.day)
     date = Date.new(year, month, day) # dateインスタンスを作成
-    printf("%2d", date.day.to_s) #日付を半角2桁の幅で右寄せで出力
+    #もし日付が今日であれば、色を反転して出力
+    if date.month == Date.today.month \
+      && date.year == Date.today.year \
+      && date.day == Date.today.day
+      print("\e[7m") # 文字色と背景色を入れ替えて表示(ANSI excape codeを使用)
+      printf("%2d", date.day.to_s) #日付を半角2桁の幅で右寄せで出力
+      print("\e[0m") #文字色、背景色をリセット
+    else
+      printf("%2d", date.day.to_s) #日付を半角2桁の幅で右寄せで出力
+    end
     # もし曜日が土曜日なら改行を、そうでなければスペースを出力
     if date.saturday?
       print("\n")

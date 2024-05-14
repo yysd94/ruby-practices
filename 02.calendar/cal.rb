@@ -105,17 +105,16 @@ def get_valid_month_and_year(input_month, input_year)
     end
   end
   if input_month
-    #月の入力値の有効な文字列フォーマットは4パターン
+    # 月の入力値の有効なフォーマットは、英単語ベースと数字ベースの2パターンで分けて考える。
     m_m_s = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.match(input_month)
     m_m_i = /^[0]{0,}([1-9]|[1][0-2])[fp]?$/.match(input_month)
-    #アルファベット表記の月と月番号を対応させるハッシュテーブルを定義
-    table_of_month_name_to_index = {
-      "JAN" => 1, "FEB" => 2, "MAR" => 3, "APR" => 4, "MAY" => 5, "JUN" => 6,
-      "JUL" => 7, "AUG" => 8, "SEP" => 9, "OCT" => 10, "NOV" => 11, "DEC" => 12,
-    }
     # 各フォーマットにマッチした場合に応じて、月の番号を取得する
     if m_m_s
-      month = tabel_of_month_name_to_index[m_m_s[0].upcase]
+      table_of_month_name_to_index = {
+        "JAN" => 1, "FEB" => 2, "MAR" => 3, "APR" => 4, "MAY" => 5, "JUN" => 6,
+        "JUL" => 7, "AUG" => 8, "SEP" => 9, "OCT" => 10, "NOV" => 11, "DEC" => 12,
+      }
+      month = table_of_month_name_to_index[m_m_s[0].upcase]
     elsif m_m_i
       case m_m_i[0].slice(-1)
       when 'f'

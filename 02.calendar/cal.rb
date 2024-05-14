@@ -76,8 +76,8 @@ def get_input_month_and_year()
     input_month = ARGV[0]
     input_year = ARGV[1]
   else
-    printf "Usage: ./cal.rb [-y] [[month] year]\n"
-    printf "       ./cal.rb [-m month] [year]\n"
+    printf "Usage: cal.rb [-y] [[month] year]\n"
+    printf "       cal.rb [-m month] [year]\n"
     exit
   end
   return input_month, input_year

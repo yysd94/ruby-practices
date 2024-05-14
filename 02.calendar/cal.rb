@@ -53,7 +53,7 @@ def display_calender_of_month(month=Date.today.month, year=Date.today.year)
       print("\s")
     end
   end
-  print("\n")
+  print("\n\n")
 end
 
 def get_input_month_and_year()

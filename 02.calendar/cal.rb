@@ -4,8 +4,11 @@ require 'date'
 require 'optparse'
 
 def main
+  # コマンドラインから入力値を取得
   input_month, input_year = get_input_month_and_year()
+  # 入力値を解析して、表示すべき月と年の数字に変換
   month, year = get_valid_month_and_year(input_month, input_year)
+  # カレンダーを表示
   if year
     if month
       display_calender_of_month(month, year)
@@ -91,13 +94,13 @@ def get_valid_month_and_year(input_month, input_year)
     if m_y
       m_y_i = m_y[0].to_i
       if m_y_i <= 0 || 10000 <= m_y_i
-        puts "year '#{input_year}' not in range 1..9999"
+        puts "cal.rb: year '#{input_year}' not in range 1..9999"
         exit
       else
         year = input_year.to_i
       end
     else
-      puts "not a valid year #{input_year}"
+      puts "cal.rb: not a valid year #{input_year}"
       exit
     end
   end
@@ -133,7 +136,7 @@ def get_valid_month_and_year(input_month, input_year)
         month = m_m_i[0].to_i
       end
     else
-      puts("#{input_month} is neither a month number (1..12) nor a name")
+      puts("cal.rb: #{input_month} is neither a month number (1..12) nor a name")
       exit
     end
   end

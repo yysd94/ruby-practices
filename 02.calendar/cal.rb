@@ -23,7 +23,6 @@ def main
 end
 
 def display_calender_of_month(month=Date.today.month, year=Date.today.year)
-  #月の初日と最終日のインスタンスを作成
   first_date_of_month = Date.new(year, month, 1)
   last_date_of_month = Date.new(year, month, -1)
   # 月の初日を表示する位置のインデント量を、その曜日に応じて計算
@@ -87,9 +86,7 @@ end
 def get_valid_month_and_year(input_month, input_year)
   month = nil
   year = nil
-
   if input_year
-    #有効な形式を表す正規表現とマッチさせる
     m_y = /^[1-9][0-9]{0,}$/.match(input_year)
     if m_y
       m_y_i = m_y[0].to_i
@@ -104,9 +101,8 @@ def get_valid_month_and_year(input_month, input_year)
       exit
     end
   end
-
   if input_month
-    #有効な形式を表す正規表現とマッチさせる
+    #月の入力値の有効な文字列フォーマットは4パターン
     m_m_s = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.match(input_month)
     m_m_i = /^[1-9]$|^[1][0-2]$/.match(input_month)
     m_m_f = /^[1-9][f]$|^[1][0-2][f]$/.match(input_month)
@@ -134,7 +130,6 @@ def get_valid_month_and_year(input_month, input_year)
       exit
     end
   end
-
   return month, year
 end
 

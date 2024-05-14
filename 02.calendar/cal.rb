@@ -87,7 +87,7 @@ def get_valid_month_and_year(input_month, input_year)
   month = nil
   year = nil
   if input_year
-    m_y = /^[1-9][0-9]{0,}$/.match(input_year)
+    m_y = /^[0-9]{0,}$/.match(input_year)
     if m_y
       m_y_i = m_y[0].to_i
       if m_y_i <= 0 || 10000 <= m_y_i
@@ -104,9 +104,7 @@ def get_valid_month_and_year(input_month, input_year)
   if input_month
     #月の入力値の有効な文字列フォーマットは4パターン
     m_m_s = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.match(input_month)
-    m_m_i = /^[1-9]$|^[1][0-2]$/.match(input_month)
-    m_m_f = /^[1-9][f]$|^[1][0-2][f]$/.match(input_month)
-    m_m_p = /^[1-9][p]$|^[1][0-2][p]$/.match(input_month)
+    m_m_i = /^[0]{0,}([1-9]|[1][0-2])[fp]?$/.match(input_month)
     #アルファベット表記の月と月番号を対応させるハッシュテーブルを定義
     table_of_month_name_to_index = {
       "JAN" => 1, "FEB" => 2, "MAR" => 3, "APR" => 4, "MAY" => 5, "JUN" => 6,
@@ -116,15 +114,18 @@ def get_valid_month_and_year(input_month, input_year)
     if m_m_s
       month = tabel_of_month_name_to_index[m_m_s[0].upcase]
     elsif m_m_i
-      month = m_m_i[0].to_i
-    elsif m_m_f
-      month = m_m_f[0].chop.to_i
-      if year.nil? && month == Date.today.month
-        year = Date.today.year + 1
+      case m_m_i[0].slice(-1)
+      when 'f'
+        month = m_m_i[0].chop.to_i
+        if year.nil? && month == Date.today.month
+          year = Date.today.year + 1
+        end
+      when 'p'
+        month = m_m_i[0].chop.to_i
+        year = Date.today.year - 1
+      else
+        month = m_m_i[0].to_i
       end
-    elsif m_m_p
-      month = m_m_p[0].chop.to_i
-      year = Date.today.year - 1
     else
       puts("#{input_month} is neither a month number (1..12) nor a name")
       exit

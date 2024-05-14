@@ -117,12 +117,18 @@ def get_valid_month_and_year(input_month, input_year)
       case m_m_i[0].slice(-1)
       when 'f'
         month = m_m_i[0].chop.to_i
-        if year.nil? && month == Date.today.month
+        if year
+          year += 1
+        elsif month <= Date.today.month
           year = Date.today.year + 1
         end
       when 'p'
         month = m_m_i[0].chop.to_i
-        year = Date.today.year - 1
+        if year
+          year -= 1
+        elsif month >= Date.today.month
+          year = Date.today.year - 1
+        end
       else
         month = m_m_i[0].to_i
       end

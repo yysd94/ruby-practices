@@ -1,35 +1,30 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 def main
-  points = ARGV[0].split(",")
-  framePoints = Array.new
-  frameCount = 1
-  while frameCount <= 10 do
+  points = ARGV[0].split(',')
+  frame_points = []
+  frame_count = 1
+  while frame_count <= 10
     if points[0] == 'X'
-      framePoint = 10 + point_to_i(points[1]) + point_to_i(points[2])
-      framePoints.push(framePoint)
+      frame_point = 10 + point_to_i(points[1]) + point_to_i(points[2])
+      frame_points.push(frame_point)
       points.shift
     else
-      framePoint = point_to_i(points[0]) + point_to_i(points[1])
-      if framePoint == 10
-        framePoint += point_to_i(points[2])
-      end
-      framePoints.push(framePoint)
+      frame_point = point_to_i(points[0]) + point_to_i(points[1])
+      frame_point += point_to_i(points[2]) if frame_point == 10
+      frame_points.push(frame_point)
       points.shift(2)
     end
-    frameCount += 1
+    frame_count += 1
   end
 
-  score = framePoints.sum
+  score = frame_points.sum
   puts score
 end
 
-def point_to_i(pointString)
-  if pointString == 'X'
-    return 10
-  else
-    return pointString.to_i
-  end
+def point_to_i(point_str)
+  point_str == 'X' ? 10 : point_str.to_i
 end
 
 main

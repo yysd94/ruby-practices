@@ -9,20 +9,10 @@ def main
   # 入力値を解析して、表示すべき月と年の数字に変換
   month, year = valid_month_and_year(input_month, input_year)
   # カレンダーを表示
-  if year
-    if month
-      display_calender_of_month(month, year)
-    else
-      puts("一年分のカレンダーを表示する機能は未実装です。")
-      exit
-    end
-  else
-    if month
-      display_calender_of_month(month, Date.today.year)
-    else
-      display_calender_of_month(Date.today.month, Date.today.year)
-    end
-  end
+  display_calender_of_month(month, year) if year && month
+  puts("一年分のカレンダーを表示する機能は未実装です。") if year && !month
+  display_calender_of_month(month, Date.today.year) if !year && month
+  display_calender_of_month(Date.today.month, Date.today.year) if !year && !month
 end
 
 def display_calender_of_month(month=Date.today.month, year=Date.today.year)
@@ -47,11 +37,7 @@ def display_calender_of_month(month=Date.today.month, year=Date.today.year)
     else
       printf("%2d", date.day.to_s)
     end
-    if date.saturday?
-      print("\n")
-    else
-      print("\s")
-    end
+    date.saturday? ? print("\n") : print("\s")
   end
   print("\n")
 end
@@ -92,7 +78,7 @@ def valid_month_and_year(input_month, input_year)
   if input_year
     matched_year = /^[0-9]{0,}$/.match(input_year)
     if matched_year
-      if matched_year[0].to_i <= 0 || 10000 <= matched_year[0].to_i
+      unless 0 < matched_year[0].to_i < 10000
         puts "cal.rb: year '#{input_year}' not in range 1..9999"
         exit
       else

@@ -32,9 +32,9 @@ def display_calender_of_month(month=Date.today.month, year=Date.today.year)
   indent_length = 3 * first_date_of_month.wday # wdayメソッドの返リ値は0-6 (日曜日が0)
 
   # カレンダーのヘッダを出力
-  print("#{first_date_of_month.strftime("%B")} #{year}".center(20) + "\n")
-  print("Su Mo Tu We Th Fr Sa\n")
-  print("".rjust(indent_length)) # 初日表示部分までの空白を出力
+  puts("#{first_date_of_month.strftime("%B")} #{year}".center(20))
+  puts("Su Mo Tu We Th Fr Sa")
+  print("".rjust(indent_length))
   # 日付けを出力
   for day in Range.new(1, last_date_of_month.day)
     date = Date.new(year, month, day)
@@ -79,8 +79,8 @@ def input_month_and_year()
     input_month = ARGV[0]
     input_year = ARGV[1]
   else
-    printf "Usage: cal.rb [-y] [[month] year]\n"
-    printf "       cal.rb [-m month] [year]\n"
+    puts "Usage: cal.rb [-y] [[month] year]"
+    puts "       cal.rb [-m month] [year]"
     exit
   end
   return input_month, input_year

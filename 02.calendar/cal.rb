@@ -110,8 +110,18 @@ def valid_month_and_year(input_month, input_year)
     # 各フォーマットにマッチした場合に応じて、月の番号を取得する
     if matched_month_name
       table_of_month_name_to_index = {
-        "JAN" => 1, "FEB" => 2, "MAR" => 3, "APR" => 4, "MAY" => 5, "JUN" => 6,
-        "JUL" => 7, "AUG" => 8, "SEP" => 9, "OCT" => 10, "NOV" => 11, "DEC" => 12,
+        "JAN" => 1,
+        "FEB" => 2,
+        "MAR" => 3,
+        "APR" => 4,
+        "MAY" => 5,
+        "JUN" => 6,
+        "JUL" => 7,
+        "AUG" => 8,
+        "SEP" => 9,
+        "OCT" => 10,
+        "NOV" => 11,
+        "DEC" => 12,
       }
       month = table_of_month_name_to_index[matched_month_name[0].upcase]
     elsif matched_month_num

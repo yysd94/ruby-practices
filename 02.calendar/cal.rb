@@ -90,10 +90,9 @@ def valid_month_and_year(input_month, input_year)
   month = nil
   year = nil
   if input_year
-    m_y = /^[0-9]{0,}$/.match(input_year)
-    if m_y
-      m_y_i = m_y[0].to_i
-      if m_y_i <= 0 || 10000 <= m_y_i
+    matched_year = /^[0-9]{0,}$/.match(input_year)
+    if matched_year
+      if matched_year[0].to_i <= 0 || 10000 <= matched_year[0].to_i
         puts "cal.rb: year '#{input_year}' not in range 1..9999"
         exit
       else
@@ -106,33 +105,33 @@ def valid_month_and_year(input_month, input_year)
   end
   if input_month
     # 月の入力値の有効なフォーマットは、英単語ベースと数字ベースの2パターンで分けて考える。
-    m_m_s = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.match(input_month)
-    m_m_i = /^[0]{0,}([1-9]|[1][0-2])[fp]?$/.match(input_month)
+    matched_month_name = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.match(input_month)
+    matched_month_num = /^[0]{0,}([1-9]|[1][0-2])[fp]?$/.match(input_month)
     # 各フォーマットにマッチした場合に応じて、月の番号を取得する
-    if m_m_s
+    if matched_month_name
       table_of_month_name_to_index = {
         "JAN" => 1, "FEB" => 2, "MAR" => 3, "APR" => 4, "MAY" => 5, "JUN" => 6,
         "JUL" => 7, "AUG" => 8, "SEP" => 9, "OCT" => 10, "NOV" => 11, "DEC" => 12,
       }
-      month = table_of_month_name_to_index[m_m_s[0].upcase]
-    elsif m_m_i
-      case m_m_i[0].slice(-1)
+      month = table_of_month_name_to_index[matched_month_name[0].upcase]
+    elsif matched_month_num
+      case matched_month_num[0].slice(-1)
       when 'f'
-        month = m_m_i[0].chop.to_i
+        month = matched_month_num[0].chop.to_i
         if year
           year += 1
         elsif month <= Date.today.month
           year = Date.today.year + 1
         end
       when 'p'
-        month = m_m_i[0].chop.to_i
+        month = matched_month_num[0].chop.to_i
         if year
           year -= 1
         elsif month >= Date.today.month
           year = Date.today.year - 1
         end
       else
-        month = m_m_i[0].to_i
+        month = matched_month_num[0].to_i
       end
     else
       puts("cal.rb: #{input_month} is neither a month number (1..12) nor a name")

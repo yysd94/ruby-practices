@@ -5,9 +5,9 @@ require 'optparse'
 
 def main
   # コマンドラインから入力値を取得
-  input_month, input_year = get_input_month_and_year()
+  input_month, input_year = input_month_and_year()
   # 入力値を解析して、表示すべき月と年の数字に変換
-  month, year = get_valid_month_and_year(input_month, input_year)
+  month, year = valid_month_and_year(input_month, input_year)
   # カレンダーを表示
   if year
     if month
@@ -56,7 +56,7 @@ def display_calender_of_month(month=Date.today.month, year=Date.today.year)
   print("\n")
 end
 
-def get_input_month_and_year()
+def input_month_and_year()
   # コマンドラインに入力されたオプションの引数を受けとる処理
   opt = OptionParser.new
   params = {}
@@ -86,7 +86,7 @@ def get_input_month_and_year()
   return input_month, input_year
 end
 
-def get_valid_month_and_year(input_month, input_year)
+def valid_month_and_year(input_month, input_year)
   month = nil
   year = nil
   if input_year

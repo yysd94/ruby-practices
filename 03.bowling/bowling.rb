@@ -8,16 +8,15 @@ def main
   frame_points = []
   frame_count = 1
   while frame_count <= 10
-    if points[0] == 10
-      frame_point = 10 + points[1..2].sum
-      frame_points.push(frame_point)
-      points.shift
+    current_point = points.shift
+    frame_point = current_point + points[0]
+    if current_point == 10
+      frame_point += points[1]
     else
-      frame_point = points[0..1].sum
-      frame_point += points[2] if frame_point == 10
-      frame_points.push(frame_point)
-      points.shift(2)
+      frame_point += points[1] if frame_point == 10
+      points.shift
     end
+    frame_points << frame_point
     frame_count += 1
   end
 

@@ -2,9 +2,7 @@
 # frozen_string_literal: true
 
 def main
-  points = ARGV[0].split(',').map{ |point_str|
-    point_str == 'X' ? 10 : point_str.to_i
-  }
+  points = ARGV[0].split(',').map { |point_str| point_str == 'X' ? 10 : point_str.to_i }
   frame_points = []
   frame_count = 1
   while frame_count <= 10

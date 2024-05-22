@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'date'
+require 'optparse'
+
+def main
+  opt = OptionParser.new
+  params = {}
+  opt.on('-m, month') { |v| params[:m] = v }
+  opt.on('-y, year') { |v| params[:y] = v }
+  opt.parse!(ARGV)
+
+  month = params[:m] ? params[:m].to_i : Date.today.month
+  year = params[:y] ? params[:y].to_i : Date.today.year
+
+  display_calender_of_month(month, year)
+end
+
+def display_calender_of_month(month, year)
+  first_date_of_month = Date.new(year, month, 1)
+  last_date_of_month = Date.new(year, month, -1)
+
+  # 月の初日を表示する位置のインデント量を、その曜日に応じて計算
+  indent_length = 3 * first_date_of_month.wday # wdayメソッドの返リ値は0-6 (日曜日が0)
+
+  # カレンダーのヘッダを出力
+  puts("#{first_date_of_month.strftime('%B')} #{year}".center(20))
+  puts('Su Mo Tu We Th Fr Sa')
+  print(''.rjust(indent_length))
+
+  # 日付けを出力
+  Range.new(1, last_date_of_month.day).each do |day|
+    date = Date.new(year, month, day)
+    printf('%2d', date.day.to_s)
+    date.saturday? ? print("\n") : print("\s")
+  end
+  print("\n")
+end
+
+main

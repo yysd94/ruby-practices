@@ -32,7 +32,13 @@ def display_calender_of_month(month, year)
   # 日付けを出力
   Range.new(1, last_date_of_month.day).each do |day|
     date = Date.new(year, month, day)
-    printf('%2d', date.day.to_s)
+    if date == Date.today
+      print("\e[7m") # 文字色と背景色を入れ替えて表示(ANSI excape codeを使用)
+      printf('%2d', date.day.to_s)
+      print("\e[0m") # 文字色、背景色をリセット
+    else
+      printf('%2d', date.day.to_s)
+    end
     date.saturday? ? print("\n") : print("\s")
   end
   print("\n")

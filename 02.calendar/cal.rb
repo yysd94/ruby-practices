@@ -17,17 +17,17 @@ def main
   display_calender_of_month(month, year)
 end
 
+INDENT_LENGTH_OF_DAY = 3
+CALENDAR_WIDTH = 20
+
 def display_calender_of_month(month, year)
   first_date_of_month = Date.new(year, month, 1)
   last_date_of_month = Date.new(year, month, -1)
 
-  # 月の初日を表示する位置のインデント量を、その曜日に応じて計算
-  indent_length = 3 * first_date_of_month.wday # wdayメソッドの返リ値は0-6 (日曜日が0)
-
   # カレンダーのヘッダを出力
-  puts("#{first_date_of_month.strftime('%B')} #{year}".center(20))
+  puts("#{first_date_of_month.strftime('%B')} #{year}".center(CALENDAR_WIDTH))
   puts('Su Mo Tu We Th Fr Sa')
-  print(''.rjust(indent_length))
+  print(' ' * INDENT_LENGTH_OF_DAY * first_date_of_month.wday)
 
   # 日付けを出力
   Range.new(1, last_date_of_month.day).each do |day|

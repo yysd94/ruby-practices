@@ -39,7 +39,7 @@ def display_calender_of_month(month, year)
     else
       printf('%2d', date.day.to_s)
     end
-    date.saturday? ? print("\n") : print("\s")
+    date.saturday? ? print("\n") : print(' ')
   end
   print("\n")
 end

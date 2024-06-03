@@ -40,4 +40,31 @@ class LsTest < Minitest::Test
       align_file_names(file_names, 8)
     )
   end
+
+  def test_get_filename_list_for_display
+    file_names = %w[file_a file_bbb file_c file_d file_e file_f file_gggggggggg]
+    assert_equal(
+      [
+        %w[file_a file_bbb file_c],
+        %w[file_d file_e file_f],
+        %w[file_gggggggggg]
+      ],
+      get_filename_list_for_display(file_names, 40)
+    )
+    assert_equal(
+      [
+        %w[file_a file_bbb file_c file_d],
+        %w[file_e file_f file_gggggggggg]
+      ],
+      get_filename_list_for_display(file_names, 30)
+    )
+    assert_equal(
+      [ %w[file_a file_bbb file_c file_d file_e file_f file_gggggggggg] ],
+      get_filename_list_for_display(file_names, 20)
+    )
+    assert_equal(
+      [ %w[file_a file_bbb file_c file_d file_e file_f file_gggggggggg] ],
+      get_filename_list_for_display(file_names, 1)
+    )
+  end
 end

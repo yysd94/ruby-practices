@@ -4,20 +4,20 @@ require 'minitest/autorun'
 require_relative '../lib/ls'
 
 class LsTest < Minitest::Test
-  def test_align_file_names_in_single_columns
+  def test_align_lists_in_single_columns
     num_of_column = 1
-    file_names = %w[file1 file2 file3]
-    assert_equal([%w[file1 file2 file3]], align_file_names(file_names, num_of_column))
+    filenames = %w[file1 file2 file3]
+    assert_equal([%w[file1 file2 file3]], align_list_to_matrix(filenames, num_of_column))
   end
 
-  def test_align_file_names_in_multi_columns
-    file_names = %w[file1 file2 file3 file4 file5 file6 file7]
+  def test_align_lists_in_multi_columns
+    filenames = %w[file1 file2 file3 file4 file5 file6 file7]
     assert_equal(
       [
         %w[file1 file2 file3 file4],
         %w[file5 file6 file7]
       ],
-      align_file_names(file_names, 2)
+      align_list_to_matrix(filenames, 2)
     )
     assert_equal(
       [
@@ -25,7 +25,7 @@ class LsTest < Minitest::Test
         %w[file4 file5 file6],
         %w[file7]
       ],
-      align_file_names(file_names, 3)
+      align_list_to_matrix(filenames, 3)
     )
     assert_equal(
       [
@@ -37,34 +37,34 @@ class LsTest < Minitest::Test
         %w[file6],
         %w[file7]
       ],
-      align_file_names(file_names, 8)
+      align_list_to_matrix(filenames, 8)
     )
   end
 
-  def test_get_filename_list_for_display
-    file_names = %w[file_a file_bbb file_c file_d file_e file_f file_gggggggggg]
+  def test_filename_matrix_for_display
+    filenames = %w[file_a file_bbb file_c file_d file_e file_f file_gggggggggg]
     assert_equal(
       [
         %w[file_a file_bbb file_c],
         %w[file_d file_e file_f],
         %w[file_gggggggggg]
       ],
-      get_filename_list_for_display(file_names, 40)
+      filename_matrix_for_display(filenames, 40)
     )
     assert_equal(
       [
         %w[file_a file_bbb file_c file_d],
         %w[file_e file_f file_gggggggggg]
       ],
-      get_filename_list_for_display(file_names, 30)
+      filename_matrix_for_display(filenames, 30)
     )
     assert_equal(
       [ %w[file_a file_bbb file_c file_d file_e file_f file_gggggggggg] ],
-      get_filename_list_for_display(file_names, 20)
+      filename_matrix_for_display(filenames, 20)
     )
     assert_equal(
       [ %w[file_a file_bbb file_c file_d file_e file_f file_gggggggggg] ],
-      get_filename_list_for_display(file_names, 1)
+      filename_matrix_for_display(filenames, 1)
     )
   end
 end

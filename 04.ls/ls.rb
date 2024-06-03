@@ -3,12 +3,24 @@
 
 INDENT_SIZE = 2
 MAX_NUM_OF_COLUMNS = 3
+WINDOW_WIDTH = `tput cols`.chomp.to_i
 
 def main
-  window_width = `tput cols`.chomp.to_i
-  target_dir = Dir.pwd
-  filenames = Dir.glob('*', base: target_dir)
-  display_filenames(filename_matrix_for_display(filenames, window_width))
+  if ARGV.empty?
+    target_dirs = ['.']
+  else
+    absolute_paths = []
+    relative_paths = []
+    ARGV.each do |arg|
+      unless File.exist?(arg)
+        puts "ls: cannot access '#{arg}': No such file or directory"
+        next
+      end
+      arg[0] == '/' ? absolute_paths << arg : relative_paths << arg
+      target_dirs = absolute_paths + relative_paths
+    end
+  end
+  display_filenames(target_dirs)
 end
 
 def align_list_to_matrix(list, num_of_column)
@@ -29,13 +41,20 @@ def filename_matrix_for_display(filenames, window_width)
   align_list_to_matrix(filenames, num_of_columns)
 end
 
-def display_filenames(filename_matrix)
-  (0...filename_matrix.map(&:size).max).each do |row|
-    filename_matrix.each do |column|
-      column_width = column.map(&:size).max + INDENT_SIZE
-      printf("%-#{column_width}s", column[row])
+def display_filenames(target_dirs)
+  target_dirs.each_with_index do |target_dir, idx|
+    filenames = Dir.glob('*', base: target_dir)
+    filename_matrix = filename_matrix_for_display(filenames, WINDOW_WIDTH)
+
+    puts "#{target_dir}:" if ARGV.size > 1
+    (0...filename_matrix.map(&:size).max).each do |row|
+      filename_matrix.each do |column|
+        column_width = column.map(&:size).max + INDENT_SIZE
+        printf("%-#{column_width}s", column[row])
+      end
+      puts ''
     end
-    puts ''
+    puts '' unless idx == target_dirs.size - 1
   end
 end
 

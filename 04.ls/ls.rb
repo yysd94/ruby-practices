@@ -7,20 +7,30 @@ WINDOW_WIDTH = `tput cols`.chomp.to_i
 
 def main
   if ARGV.empty?
-    target_dirs = ['.']
+    valid_filename_paths = []
+    valid_dir_paths = ['.']
   else
-    absolute_paths = []
-    relative_paths = []
+    absolute_dir_paths = []
+    relative_dir_paths = []
+    absolute_filename_paths = []
+    relative_filename_paths = []
     ARGV.each do |arg|
       unless File.exist?(arg)
         puts "ls: cannot access '#{arg}': No such file or directory"
         next
       end
-      arg[0] == '/' ? absolute_paths << arg : relative_paths << arg
-      target_dirs = absolute_paths + relative_paths
+      if File.directory?(arg)
+        arg[0] == '/' ? absolute_dir_paths << arg : relative_dir_paths << arg
+      else
+        arg[0] == '/' ? absolute_filename_paths << arg : relative_filename_paths << arg
+      end
     end
+    valid_filename_paths = absolute_filename_paths + relative_filename_paths
+    valid_dir_paths = absolute_dir_paths + relative_dir_paths
   end
-  display_filenames(target_dirs)
+
+  display_filename_paths(valid_filename_paths) unless valid_filename_paths.empty?
+  display_filenames_in_dirs(valid_dir_paths)
 end
 
 def align_list_to_matrix(list, num_of_column)
@@ -41,7 +51,14 @@ def filename_matrix_for_display(filenames, window_width)
   align_list_to_matrix(filenames, num_of_columns)
 end
 
-def display_filenames(target_dirs)
+def display_filename_paths(target_filename_paths)
+  target_filename_paths.each do |target_filename_path|
+    print(target_filename_path + '  ')
+  end
+  print("\n\n")
+end
+
+def display_filenames_in_dirs(target_dirs)
   target_dirs.each_with_index do |target_dir, idx|
     filenames = Dir.glob('*', base: target_dir)
     filename_matrix = filename_matrix_for_display(filenames, WINDOW_WIDTH)

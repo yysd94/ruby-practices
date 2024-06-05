@@ -34,7 +34,7 @@ def valid_input_paths
 end
 
 def align_filenames_into_matrix(filenames, num_of_columns)
-  num_of_rows = filenames.size / num_of_columns + 1
+  num_of_rows = (filenames.size - 1) / num_of_columns + 1
   matrix = filenames.each_slice(num_of_rows).to_a
   matrix.map! do |col|
     col_width = col.map(&:size).max

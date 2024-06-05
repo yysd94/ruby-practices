@@ -11,11 +11,11 @@ def main
     display_filenames(filename_paths)
     puts '' unless dir_paths.empty?
   end
-  dir_paths.each_with_index do |dir_path, idx|
+  dir_paths.each_with_index do |dir_path, index|
     puts "#{dir_path}:" if ARGV.size > 1
     filenames = Dir.glob('*', base: dir_path)
     display_filenames(filenames)
-    puts '' unless idx == dir_paths.size - 1
+    puts '' unless index == dir_paths.size - 1
   end
 end
 
@@ -35,14 +35,14 @@ end
 
 def align_filenames_into_matrix(filenames, num_of_columns)
   num_of_rows = (filenames.size - 1) / num_of_columns + 1
-  matrix = filenames.each_slice(num_of_rows).to_a
-  matrix.map! do |col|
-    col_width = col.map(&:size).max
-    col.map { |path| path.ljust(col_width) }
+  filename_matrix = filenames.each_slice(num_of_rows).to_a
+  filename_matrix.map! do |column|
+    column_width = column.map(&:size).max
+    column.map { |path| path.ljust(column_width) }
   end
-  max_row_size = matrix.map(&:size).max
-  matrix.map! { |col| col.values_at(0...max_row_size) } # 各列の要素数を最大の要素数に合わせ、nilで補充する
-  matrix.transpose
+  max_row_size = filename_matrix.map(&:size).max
+  filename_matrix.map! { |column| column.values_at(0...max_row_size) } # 各列の要素数を最大の要素数に合わせ、nilで補充する
+  filename_matrix.transpose
 end
 
 def display_filenames(filenames)
@@ -52,6 +52,7 @@ def display_filenames(filenames)
     matrix_display_width =
       align_filenames_into_matrix(filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
     break if matrix_display_width > WINDOW_WIDTH
+
     num_of_columns += 1
   end
   align_filenames_into_matrix(filenames, num_of_columns).each do |row|

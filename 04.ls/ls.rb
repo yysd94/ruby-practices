@@ -6,13 +6,7 @@ MAX_NUM_OF_COLUMNS = 3
 WINDOW_WIDTH = `tput cols`.chomp.to_i
 
 def main
-  filename_paths = []
-  dir_paths = []
-  if ARGV.empty?
-    dir_paths << '.'
-  else
-    filename_paths, dir_paths = valid_input_paths
-  end
+  filename_paths, dir_paths = valid_input_paths
   unless filename_paths.empty?
     display_filenames(filename_paths)
     puts '' unless dir_paths.empty?
@@ -28,6 +22,7 @@ end
 def valid_input_paths
   valid_dir_paths = []
   valid_filename_paths = []
+  valid_dir_paths << '.' if ARGV.empty?
   ARGV.each do |arg|
     unless File.exist?(arg)
       puts "ls: cannot access '#{arg}': No such file or directory"
@@ -38,8 +33,8 @@ def valid_input_paths
   [valid_filename_paths, valid_dir_paths]
 end
 
-def align_filenames_into_matrix(filenames, num_of_column)
-  num_of_rows = filenames.size / num_of_column + 1
+def align_filenames_into_matrix(filenames, num_of_columns)
+  num_of_rows = filenames.size / num_of_columns + 1
   matrix = filenames.each_slice(num_of_rows).to_a
   matrix.map! do |col|
     col_width = col.map(&:size).max
@@ -57,7 +52,6 @@ def display_filenames(filenames)
     matrix_display_width =
       align_filenames_into_matrix(filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
     break if matrix_display_width > WINDOW_WIDTH
-
     num_of_columns += 1
   end
   align_filenames_into_matrix(filenames, num_of_columns).each do |row|

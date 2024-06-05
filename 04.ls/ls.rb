@@ -46,6 +46,8 @@ def align_filenames_into_matrix(filenames, num_of_columns)
 end
 
 def display_filenames(filenames)
+  return if filenames.empty?
+
   num_of_columns = 1
   # ウインドウの幅におさまる範囲で表示列数を最大にする
   while num_of_columns < MAX_NUM_OF_COLUMNS

@@ -31,7 +31,7 @@ def valid_input_paths
   [valid_filename_paths, valid_dir_paths]
 end
 
-def align_filenames_into_matrix(filenames, num_of_columns)
+def create_matrix_for_display(filenames, num_of_columns)
   num_of_rows = (filenames.size - 1) / num_of_columns + 1
   filename_matrix = filenames.each_slice(num_of_rows).to_a
   max_row_size = filename_matrix.map(&:size).max
@@ -49,12 +49,12 @@ def display_filenames(filenames)
   # ウインドウの幅におさまる範囲で表示列数を最大にする
   while num_of_columns < MAX_NUM_OF_COLUMNS
     matrix_display_width =
-      align_filenames_into_matrix(filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
+      create_matrix_for_display(filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
     break if matrix_display_width > WINDOW_WIDTH
 
     num_of_columns += 1
   end
-  align_filenames_into_matrix(filenames, num_of_columns).each do |row|
+  create_matrix_for_display(filenames, num_of_columns).each do |row|
     puts row.join(' ' * INDENT_SIZE)
   end
 end

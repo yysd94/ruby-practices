@@ -8,12 +8,12 @@ WINDOW_WIDTH = `tput cols`.chomp.to_i
 def main
   filename_paths, dir_paths = valid_input_paths
   display_filenames(filename_paths)
-  puts '' if !filename_paths.empty? && !dir_paths.empty?
+  puts if !filename_paths.empty? && !dir_paths.empty?
   dir_paths.each_with_index do |dir_path, index|
     puts "#{dir_path}:" if ARGV.size > 1
     filenames = Dir.glob('*', base: dir_path)
     display_filenames(filenames)
-    puts '' unless index == dir_paths.size - 1
+    puts unless index == dir_paths.size - 1
   end
 end
 

@@ -34,13 +34,12 @@ end
 def align_filenames_into_matrix(filenames, num_of_columns)
   num_of_rows = (filenames.size - 1) / num_of_columns + 1
   filename_matrix = filenames.each_slice(num_of_rows).to_a
-  filename_matrix.map! do |column|
+  max_row_size = filename_matrix.map(&:size).max
+  filename_matrix.map do |column|
     column_width = column.map(&:size).max
     column.map { |path| path.ljust(column_width) }
-  end
-  max_row_size = filename_matrix.map(&:size).max
-  filename_matrix.map! { |column| column.values_at(0...max_row_size) } # 各列の要素数を最大の要素数に合わせ、nilで補充する
-  filename_matrix.transpose
+          .values_at(0...max_row_size) # 各列の要素数を最大の要素数に合わせ、nilで補充する
+  end.transpose
 end
 
 def display_filenames(filenames)

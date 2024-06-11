@@ -26,7 +26,7 @@ def valid_input_paths
       puts "ls: cannot access '#{arg}': No such file or directory"
       next
     end
-    File.directory?(arg) ? valid_dir_paths << arg : valid_filename_paths << arg
+    (File.directory?(arg) ? valid_dir_paths : valid_filename_paths) << arg
   end
   [valid_filename_paths, valid_dir_paths]
 end

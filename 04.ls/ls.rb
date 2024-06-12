@@ -10,7 +10,7 @@ WINDOW_WIDTH = `tput cols`.chomp.to_i
 def main
   filename_pattern_flag = 0
   opt = OptionParser.new
-  opt.on('-a') { |v| filename_pattern_flag = File::FNM_DOTMATCH if v }
+  opt.on('-a') { filename_pattern_flag = File::FNM_DOTMATCH }
   opt.parse!(ARGV)
 
   filename_paths, dir_paths = valid_input_paths

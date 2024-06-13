@@ -1,17 +1,24 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'optparse'
+
 INDENT_SIZE = 2
 MAX_NUM_OF_COLUMNS = 3
 WINDOW_WIDTH = `tput cols`.chomp.to_i
 
 def main
+  filename_pattern_flag = 0
+  opt = OptionParser.new
+  opt.on('-a') { filename_pattern_flag = File::FNM_DOTMATCH }
+  opt.parse!(ARGV)
+
   filename_paths, dir_paths = valid_input_paths
   display_filenames(filename_paths)
   puts if !filename_paths.empty? && !dir_paths.empty?
   dir_paths.each_with_index do |dir_path, index|
     puts "#{dir_path}:" if ARGV.size > 1
-    filenames = Dir.glob('*', base: dir_path)
+    filenames = Dir.glob('*', flags: filename_pattern_flag, base: dir_path)
     display_filenames(filenames)
     puts unless index == dir_paths.size - 1
   end
@@ -45,16 +52,17 @@ end
 def display_filenames(filenames)
   return if filenames.empty?
 
+  sorted_filenames = filenames.sort_by { |filename| filename.delete_prefix('.').downcase }
   num_of_columns = 1
   # ウインドウの幅におさまる範囲で表示列数を最大にする
   while num_of_columns < MAX_NUM_OF_COLUMNS
     matrix_display_width =
-      create_matrix_for_display(filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
+      create_matrix_for_display(sorted_filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
     break if matrix_display_width > WINDOW_WIDTH
 
     num_of_columns += 1
   end
-  create_matrix_for_display(filenames, num_of_columns).each do |row|
+  create_matrix_for_display(sorted_filenames, num_of_columns).each do |row|
     puts row.join(' ' * INDENT_SIZE)
   end
 end

@@ -19,7 +19,7 @@ def main
   puts if !filename_paths.empty? && !dir_paths.empty?
   dir_paths.each_with_index do |dir_path, index|
     puts "#{dir_path}:" if ARGV.size > 1
-    filenames = Dir.glob('*', flags: flags[:filename_pattern], base: dir_path)
+    filenames = Dir.glob('*', flags[:filename_pattern], base: dir_path)
     sorted_filenames = sort_for_display(filenames, flags[:reverse])
     display_filenames(sorted_filenames)
     puts unless index == dir_paths.size - 1

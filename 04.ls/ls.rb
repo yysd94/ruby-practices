@@ -2,26 +2,38 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'etc'
 
 INDENT_SIZE = 2
 MAX_NUM_OF_COLUMNS = 3
 WINDOW_WIDTH = `tput cols`.chomp.to_i
+BLOCK_SIZE_RATIO = 2
 
 def main
-  flags = { filename_pattern: 0, reverse: false }
+  flags = { filename_pattern: 0, reverse: false, long_format: false}
   opt = OptionParser.new
   opt.on('-a') { flags[:filename_pattern] = File::FNM_DOTMATCH }
   opt.on('-r') { flags[:reverse] = true }
+  opt.on('-l') { flags[:long_format] = true }
   opt.parse!(ARGV)
 
   filename_paths, dir_paths = valid_input_paths
-  display_filenames(filename_paths)
+  if flags[:long_format]
+    display_file_status(filename_paths)
+  else
+    display_filenames(filename_paths)
+  end
   puts if !filename_paths.empty? && !dir_paths.empty?
   dir_paths.each_with_index do |dir_path, index|
+    fs = File::Stat.new(File.expand_path(dir_path))
     puts "#{dir_path}:" if ARGV.size > 1
     filenames = Dir.glob('*', flags[:filename_pattern], base: dir_path)
     sorted_filenames = sort_for_display(filenames, flags[:reverse])
-    display_filenames(sorted_filenames)
+    if flags[:long_format]
+      display_file_status(sorted_filenames)
+    else
+      display_filenames(sorted_filenames)
+    end
     puts unless index == dir_paths.size - 1
   end
 end
@@ -54,6 +66,23 @@ def create_matrix_for_display(filenames, num_of_columns)
     column.map { |path| path.ljust(column_width) }
           .values_at(0...max_row_size) # 各列の要素数を最大の要素数に合わせ、nilで補充する
   end.transpose
+end
+
+def display_file_status(filenames)
+  return if filenames.empty?
+
+  block_counts = filenames.map do |filename|
+    File.lstat(File.expand_path(filename)).blocks
+  end.sum
+  puts "total #{ block_counts / BLOCK_SIZE_RATIO }"
+
+  filenames.each do |filename|
+    fs = File.lstat(File.expand_path(filename))
+    owner_name = Etc.getpwuid(fs.uid).name
+    group_name = Etc.getgrgid(fs.gid).name
+    printf "%o ", fs.mode
+    puts "#{fs.nlink} #{owner_name} #{group_name} #{fs.size} #{fs.mtime} #{filename}"
+  end
 end
 
 def display_filenames(filenames)

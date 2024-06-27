@@ -92,13 +92,13 @@ def convert_filemode_to_display_format(filemode)
   filemode_octal = format('%06<number>d', number: filemode.to_s(8))
   filemode_str = FILETYPE[filemode_octal.slice(0..1)] + (3..5).map { |i| PERMISSION[filemode_octal.slice(i)] }.join
   special_permission = format('%03<number>d', number: filemode_octal.slice(2).to_i(2))
-  if special_permission.slice(0) == 1
+  if special_permission.slice(0) == '1'
     filemode_str[3] = filemode_str[3] == 'x' ? 's' : 'S'
   end
-  if special_permission.slice(1) == 1
+  if special_permission.slice(1) == '1'
     filemode_str[6] = filemode_str[6] == 'x' ? 's' : 'S'
   end
-  if special_permission.slice(2) == 1
+  if special_permission.slice(2) == '1'
     filemode_str[9] = filemode_str[9] == 'x' ? 't' : 'T'
   end
 

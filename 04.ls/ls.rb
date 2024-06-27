@@ -109,7 +109,7 @@ def convert_timestamp_to_display_format(timestamp)
   timestamp.strftime('%b %e ') + if timestamp.year == Time.now.year
                                    timestamp.strftime('%R')
                                  else
-                                   timestamp.strftime('%Y')
+                                   timestamp.strftime(' %Y')
                                  end
 end
 
@@ -123,14 +123,23 @@ end
 def display_file_status(filenames, dir_path = '.')
   return if filenames.empty?
 
-  filenames.each do |filename|
+  file_info = filenames.map do |filename|
     fs = File.lstat(File.expand_path(filename, dir_path))
     owner_name = Etc.getpwuid(fs.uid).name
     group_name = Etc.getgrgid(fs.gid).name
     filemode = convert_filemode_to_display_format(fs.mode)
     timestamp = convert_timestamp_to_display_format(fs.mtime)
-    puts "#{filemode} #{fs.nlink} #{owner_name} #{group_name} #{fs.size} #{timestamp} #{filename}"
+    [filemode, fs.nlink.to_s, owner_name, group_name, fs.size.to_s, timestamp, filename]
   end
+  list = file_info.transpose.map.with_index do |column, idx|
+    column_width = column.map(&:size).max
+    case idx
+    when 1, 4 then column.map! { |item| item.to_s.rjust(column_width) }
+    when 2, 3, 6 then column.map! { |item| item.to_s.ljust(column_width) }
+    end
+    column
+  end.transpose
+  list.each { |row| puts row.join(' ') }
 end
 
 def display_filenames(filenames)

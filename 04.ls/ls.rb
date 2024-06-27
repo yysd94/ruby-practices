@@ -109,7 +109,13 @@ def display_file_status(filenames)
     owner_name = Etc.getpwuid(fs.uid).name
     group_name = Etc.getgrgid(fs.gid).name
     filemode = convert_to_display_format(fs.mode)
-    puts "#{filemode} #{fs.nlink} #{owner_name} #{group_name} #{fs.size} #{fs.mtime} #{filename}"
+    timestamp = fs.mtime.strftime('%b %e ')
+    if fs.mtime.year == Time.now.year
+      timestamp += fs.mtime.strftime('%R')
+    else
+      timestamp += fs.mtime.strftime('%Y')
+    end
+    puts "#{filemode} #{fs.nlink} #{owner_name} #{group_name} #{fs.size} #{timestamp} #{filename}"
   end
 end
 

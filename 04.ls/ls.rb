@@ -38,24 +38,10 @@ def main
   opt.parse!(ARGV)
 
   filename_paths, dir_paths = valid_input_paths
-  if flags[:long_format]
-    display_file_status(filename_paths)
-  else
-    display_filenames(filename_paths)
-  end
+
+  display_files(filename_paths, flags)
   puts if !filename_paths.empty? && !dir_paths.empty?
-  dir_paths.each_with_index do |dir_path, index|
-    puts "#{dir_path}:" if ARGV.size > 1
-    filenames = Dir.glob('*', flags[:filename_pattern], base: dir_path)
-    sorted_filenames = sort_for_display(filenames, flags[:reverse])
-    if flags[:long_format]
-      display_total_blocks(sorted_filenames, dir_path)
-      display_file_status(sorted_filenames, dir_path)
-    else
-      display_filenames(sorted_filenames)
-    end
-    puts unless index == dir_paths.size - 1
-  end
+  display_dirs(dir_paths, flags)
 end
 
 def valid_input_paths
@@ -88,6 +74,30 @@ def create_matrix_for_display(filenames, num_of_columns)
   end.transpose
 end
 
+def display_filenames(filenames)
+  return if filenames.empty?
+
+  num_of_columns = 1
+  # ウインドウの幅におさまる範囲で表示列数を最大にする
+  while num_of_columns < MAX_NUM_OF_COLUMNS
+    matrix_display_width =
+      create_matrix_for_display(filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
+    break if matrix_display_width > WINDOW_WIDTH
+
+    num_of_columns += 1
+  end
+  create_matrix_for_display(filenames, num_of_columns).each do |row|
+    puts row.join(' ' * INDENT_SIZE)
+  end
+end
+
+def display_total_blocks(filenames, dir_path = '.')
+  block_counts = filenames.map do |filename|
+    File.lstat(File.expand_path(filename, dir_path)).blocks
+  end.sum
+  puts "total #{block_counts / BLOCK_SIZE_RATIO}"
+end
+
 def convert_filemode_to_display_format(filemode)
   filemode_octal = format('%06<number>d', number: filemode.to_s(8))
   filemode_str = FILETYPE[filemode_octal.slice(0..1)] + (3..5).map { |i| PERMISSION[filemode_octal.slice(i)] }.join
@@ -113,49 +123,53 @@ def convert_timestamp_to_display_format(timestamp)
                                  end
 end
 
-def display_total_blocks(filenames, dir_path = '.')
-  block_counts = filenames.map do |filename|
-    File.lstat(File.expand_path(filename, dir_path)).blocks
-  end.sum
-  puts "total #{block_counts / BLOCK_SIZE_RATIO}"
+def file_status_list(filenames, dir_path = '.')
+  filenames.map do |filename|
+    file_path = File.expand_path(filename, dir_path)
+    fs = File.lstat(file_path)
+    owner_name = Etc.getpwuid(fs.uid).name
+    group_name = Etc.getgrgid(fs.gid).name
+    filemode = convert_filemode_to_display_format(fs.mode)
+    timestamp = convert_timestamp_to_display_format(fs.mtime)
+    filename += " -> #{File.readlink(file_path)}" if File.symlink?(file_path)
+    [filemode, fs.nlink.to_s, owner_name, group_name, fs.size.to_s, timestamp, filename]
+  end
 end
 
 def display_file_status(filenames, dir_path = '.')
   return if filenames.empty?
 
-  file_info = filenames.map do |filename|
-    fs = File.lstat(File.expand_path(filename, dir_path))
-    owner_name = Etc.getpwuid(fs.uid).name
-    group_name = Etc.getgrgid(fs.gid).name
-    filemode = convert_filemode_to_display_format(fs.mode)
-    timestamp = convert_timestamp_to_display_format(fs.mtime)
-    [filemode, fs.nlink.to_s, owner_name, group_name, fs.size.to_s, timestamp, filename]
-  end
-  list = file_info.transpose.map.with_index do |column, idx|
+  file_status_list = file_status_list(filenames, dir_path).transpose.map.with_index do |column, index|
     column_width = column.map(&:size).max
-    case idx
-    when 1, 4 then column.map! { |item| item.to_s.rjust(column_width) }
-    when 2, 3, 6 then column.map! { |item| item.to_s.ljust(column_width) }
+    case index
+    when 1, 4 then column.map! { |v| v.rjust(column_width) }
+    when 2, 3, 6 then column.map! { |v| v.ljust(column_width) }
     end
     column
   end.transpose
-  list.each { |row| puts row.join(' ') }
+  file_status_list.each { |row| puts row.join(' ') }
 end
 
-def display_filenames(filenames)
-  return if filenames.empty?
-
-  num_of_columns = 1
-  # ウインドウの幅におさまる範囲で表示列数を最大にする
-  while num_of_columns < MAX_NUM_OF_COLUMNS
-    matrix_display_width =
-      create_matrix_for_display(filenames, num_of_columns + 1)[0].join(' ' * INDENT_SIZE).length
-    break if matrix_display_width > WINDOW_WIDTH
-
-    num_of_columns += 1
+def display_files(filename_paths, flags)
+  if flags[:long_format]
+    display_file_status(filename_paths)
+  else
+    display_filenames(filename_paths)
   end
-  create_matrix_for_display(filenames, num_of_columns).each do |row|
-    puts row.join(' ' * INDENT_SIZE)
+end
+
+def display_dirs(dir_paths, flags)
+  dir_paths.each_with_index do |dir_path, index|
+    puts "#{dir_path}:" if ARGV.size > 1
+    filenames = Dir.glob('*', flags[:filename_pattern], base: dir_path)
+    sorted_filenames = sort_for_display(filenames, flags[:reverse])
+    if flags[:long_format]
+      display_total_blocks(sorted_filenames, dir_path)
+      display_file_status(sorted_filenames, dir_path)
+    else
+      display_filenames(sorted_filenames)
+    end
+    puts unless index == dir_paths.size - 1
   end
 end
 

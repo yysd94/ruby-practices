@@ -38,13 +38,22 @@ def main
   opt.parse!(ARGV)
 
   filename_paths, dir_paths = valid_input_paths
-  display_filenames(filename_paths, flags[:long_format])
+  if flags[:long_format]
+    display_file_status(filename_paths)
+  else
+    display_filenames(filename_paths)
+  end
   puts if !filename_paths.empty? && !dir_paths.empty?
   dir_paths.each_with_index do |dir_path, index|
     puts "#{dir_path}:" if ARGV.size > 1
     filenames = Dir.glob('*', flags[:filename_pattern], base: dir_path)
     sorted_filenames = sort_for_display(filenames, flags[:reverse])
-    display_filenames(sorted_filenames, flags[:long_format])
+    if flags[:long_format]
+      display_total_blocks(sorted_filenames, dir_path)
+      display_file_status(sorted_filenames, dir_path)
+    else
+      display_filenames(sorted_filenames)
+    end
     puts unless index == dir_paths.size - 1
   end
 end
@@ -79,7 +88,7 @@ def create_matrix_for_display(filenames, num_of_columns)
   end.transpose
 end
 
-def convert_to_display_format(filemode)
+def convert_filemode_to_display_format(filemode)
   filemode_octal = format('%06<number>d', number: filemode.to_s(8))
   filemode_str = FILETYPE[filemode_octal.slice(0..1)] + (3..5).map { |i| PERMISSION[filemode_octal.slice(i)] }.join
   special_permission = format('%03<number>d', number: filemode_octal.slice(2).to_i(2))
@@ -96,36 +105,36 @@ def convert_to_display_format(filemode)
   filemode_str
 end
 
-def display_file_status(filenames)
-  return if filenames.empty?
+def convert_timestamp_to_display_format(timestamp)
+  timestamp.strftime('%b %e ') + if timestamp.year == Time.now.year
+                                   timestamp.strftime('%R')
+                                 else
+                                   timestamp.strftime('%Y')
+                                 end
+end
 
+def display_total_blocks(filenames, dir_path = '.')
   block_counts = filenames.map do |filename|
-    File.lstat(File.expand_path(filename)).blocks
+    File.lstat(File.expand_path(filename, dir_path)).blocks
   end.sum
   puts "total #{block_counts / BLOCK_SIZE_RATIO}"
+end
+
+def display_file_status(filenames, dir_path = '.')
+  return if filenames.empty?
 
   filenames.each do |filename|
-    fs = File.lstat(File.expand_path(filename))
+    fs = File.lstat(File.expand_path(filename, dir_path))
     owner_name = Etc.getpwuid(fs.uid).name
     group_name = Etc.getgrgid(fs.gid).name
-    filemode = convert_to_display_format(fs.mode)
-    timestamp = fs.mtime.strftime('%b %e ')
-    if fs.mtime.year == Time.now.year
-      timestamp += fs.mtime.strftime('%R')
-    else
-      timestamp += fs.mtime.strftime('%Y')
-    end
+    filemode = convert_filemode_to_display_format(fs.mode)
+    timestamp = convert_timestamp_to_display_format(fs.mtime)
     puts "#{filemode} #{fs.nlink} #{owner_name} #{group_name} #{fs.size} #{timestamp} #{filename}"
   end
 end
 
-def display_filenames(filenames, long_format_flag)
+def display_filenames(filenames)
   return if filenames.empty?
-
-  if long_format_flag
-    display_file_status(filenames)
-    return
-  end
 
   num_of_columns = 1
   # ウインドウの幅におさまる範囲で表示列数を最大にする

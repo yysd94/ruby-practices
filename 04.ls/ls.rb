@@ -98,7 +98,7 @@ def display_total_blocks(filenames, dir_path = '.')
   puts "total #{block_counts / BLOCK_SIZE_RATIO}"
 end
 
-def convert_filemode_to_display_format(filemode)
+def decode_filemode_to_string(filemode)
   filemode_octal = format('%06<number>d', number: filemode.to_s(8))
   filemode_str = FILETYPE[filemode_octal.slice(0..1)] + (3..5).map { |i| PERMISSION[filemode_octal.slice(i)] }.join
   special_permission = format('%03<number>d', number: filemode_octal.slice(2).to_i(2))
@@ -129,7 +129,7 @@ def file_status_list(filenames, dir_path = '.')
     fs = File.lstat(file_path)
     owner_name = Etc.getpwuid(fs.uid).name
     group_name = Etc.getgrgid(fs.gid).name
-    filemode = convert_filemode_to_display_format(fs.mode)
+    filemode = decode_filemode_to_string(fs.mode)
     timestamp = convert_timestamp_to_display_format(fs.mtime)
     filename += " -> #{File.readlink(file_path)}" if File.symlink?(file_path)
     [filemode, fs.nlink.to_s, owner_name, group_name, fs.size.to_s, timestamp, filename]

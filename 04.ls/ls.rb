@@ -123,31 +123,35 @@ def convert_timestamp_to_display_format(timestamp)
                                  end
 end
 
-def file_status_list(filenames, dir_path = '.')
-  filenames.map do |filename|
-    file_path = File.expand_path(filename, dir_path)
-    fs = File.lstat(file_path)
-    owner_name = Etc.getpwuid(fs.uid).name
-    group_name = Etc.getgrgid(fs.gid).name
-    filemode = decode_filemode_to_string(fs.mode)
-    timestamp = convert_timestamp_to_display_format(fs.mtime)
-    filename += " -> #{File.readlink(file_path)}" if File.symlink?(file_path)
-    [filemode, fs.nlink.to_s, owner_name, group_name, fs.size.to_s, timestamp, filename]
-  end
+def file_status(filename, dir_path = '.')
+  file_path = File.expand_path(filename, dir_path)
+  fs = File.lstat(file_path)
+  filemode = decode_filemode_to_string(fs.mode)
+  nlink = fs.nlink.to_s
+  owner_name = Etc.getpwuid(fs.uid).name
+  group_name = Etc.getgrgid(fs.gid).name
+  filesize = fs.size.to_s
+  timestamp = convert_timestamp_to_display_format(fs.mtime)
+  filename += " -> #{File.readlink(file_path)}" if File.symlink?(file_path)
+  { filemode:, nlink:, owner_name:, group_name:, filesize:, timestamp:, filename: }
 end
 
 def display_file_status(filenames, dir_path = '.')
   return if filenames.empty?
 
-  file_status_list = file_status_list(filenames, dir_path).transpose.map.with_index do |column, index|
-    column_width = column.map(&:size).max
-    case index
-    when 1, 4 then column.map! { |v| v.rjust(column_width) }
-    when 2, 3, 6 then column.map! { |v| v.ljust(column_width) }
-    end
-    column
-  end.transpose
-  file_status_list.each { |row| puts row.join(' ') }
+  file_status_list = filenames.map { |filename| file_status(filename, dir_path) }
+
+  file_status_list.each do |file_status|
+    output = file_status.map do |key, value|
+      max_width = file_status_list.map { |v| v[key].size }.max
+      case key
+      when :nlink, :filesize then value.rjust(max_width)
+      when :owner_name, :group_name, :filename then value.ljust(max_width)
+      else value
+      end
+    end.join(' ')
+    puts output
+  end
 end
 
 def display_files(filename_paths, flags)

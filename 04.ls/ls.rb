@@ -137,7 +137,11 @@ def file_status(filename, dir_path = '.')
   nlink = fs.nlink.to_s
   owner_name = Etc.getpwuid(fs.uid).name
   group_name = Etc.getgrgid(fs.gid).name
-  filesize = fs.size.to_s
+  filesize = if filemode.start_with?('b', 'c')
+               [fs.rdev_major, fs.rdev_minor].join(', ')
+             else
+               fs.size.to_s
+             end
   timestamp = convert_timestamp_to_display_format(fs.mtime)
   filename += " -> #{File.readlink(file_path)}" if File.symlink?(file_path)
   { filemode:, nlink:, owner_name:, group_name:, filesize:, timestamp:, filename: }

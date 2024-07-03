@@ -7,7 +7,7 @@ require 'etc'
 INDENT_SIZE = 2
 MAX_NUM_OF_COLUMNS = 3
 WINDOW_WIDTH = `tput cols`.chomp.to_i
-BLOCK_SIZE_RATIO = 2
+BLOCK_SIZE_RATIO = 2 # Rubyとos標準lsコマンド間のブロックサイズの基準の違いを補正する比率
 
 FILE_TYPES = {
   1 => 'p',

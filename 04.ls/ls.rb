@@ -153,12 +153,14 @@ def display_file_status(filenames, dir_path = '.')
   return if filenames.empty?
 
   file_status_list = filenames.map { |filename| file_status(filename, dir_path) }
+  max_width = file_status_list[0].keys.map do |key|
+    [key, file_status_list.map { |v| v[key].size }.max]
+  end.to_h
   file_status_list.each do |file_status|
     output = file_status.map do |key, value|
-      max_width = file_status_list.map { |v| v[key].size }.max
       case key
-      when :nlink, :filesize then value.rjust(max_width)
-      when :owner_name, :group_name, :filename then value.ljust(max_width)
+      when :nlink, :filesize then value.rjust(max_width[key])
+      when :owner_name, :group_name, :filename then value.ljust(max_width[key])
       else value
       end
     end.join(' ')

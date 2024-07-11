@@ -18,6 +18,7 @@ FILE_TYPES = {
   12 => 'l',
   14 => 's'
 }.freeze
+
 PERMISSION_TYPES = {
   0 => '---',
   1 => '--x',
@@ -28,6 +29,7 @@ PERMISSION_TYPES = {
   6 => 'rw-',
   7 => 'rwx'
 }.freeze
+
 AUTHORITY_LEVELS = {
   0 => { name: 'owner', special_permission: { name: 'SUID', letter: 's' } },
   1 => { name: 'group', special_permission: { name: 'SGID', letter: 's' } },

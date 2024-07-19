@@ -19,8 +19,8 @@ def main
     end.join(' ')
     puts output
   else
-    outputs = read_count_status_from_files
-    display_count_status_list(outputs) if !outputs.empty?
+    count_status_list = read_count_status_from_files
+    display_count_status_list(count_status_list) if !count_status_list.empty?
   end
 end
 

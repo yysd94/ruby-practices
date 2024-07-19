@@ -31,13 +31,10 @@ def count_status(input_lines)
 end
 
 def total_count_status(count_status)
-  total_lines = count_status.map { |v| v[:n_lines] }.sum
-  total_words = count_status.map { |v| v[:n_words] }.sum
-  total_chars = count_status.map { |v| v[:n_chars] }.sum
   {
-    n_lines: total_lines,
-    n_words: total_words,
-    n_chars: total_chars
+    n_lines: count_status.map { |v| v[:n_lines] }.sum,
+    n_words: count_status.map { |v| v[:n_words] }.sum,
+    n_chars: count_status.map { |v| v[:n_chars] }.sum
   }
 end
 
@@ -77,11 +74,12 @@ def display_count_status_list(count_status_list)
   column_width = count_status_list[0].except(:filename).keys.map do |key|
     count_status_list.map { |v| v[key].to_s.size }.max
   end.max
-  count_status_list.each do |output|
-    output_line = output.except(:filename).values.map do |value|
+  count_status_list.each do |count_status|
+    output = count_status.except(:filename).values.map do |value|
       value.to_s.rjust(column_width)
-    end.join(' ')
-    puts "#{output_line} #{output[:filename]}"
+    end
+    output << count_status[:filename]
+    puts output.join(' ')
   end
 end
 

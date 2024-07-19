@@ -74,12 +74,12 @@ end
 def display_count_status_list(count_status_list)
   return if count_status_list.empty?
 
-  max_width = count_status_list[0].except(:filename).keys.map do |key|
+  column_width = count_status_list[0].except(:filename).keys.map do |key|
     count_status_list.map { |v| v[key].to_s.size }.max
   end.max
   count_status_list.each do |output|
     output_line = output.except(:filename).values.map do |value|
-      value.to_s.rjust(max_width)
+      value.to_s.rjust(column_width)
     end.join(' ')
     puts "#{output_line} #{output[:filename]}"
   end

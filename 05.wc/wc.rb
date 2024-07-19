@@ -40,7 +40,7 @@ def read_count_status_from_files
       count_status_list << file_count_status(arg)
     end
   end
-  count_status_list << total_status(count_status_list) if ARGV.size > 1
+  count_status_list << total_count_status(count_status_list) if ARGV.size > 1
   count_status_list
 end
 
@@ -76,7 +76,7 @@ def file_count_status(file_path)
   end
 end
 
-def total_status(count_status)
+def total_count_status(count_status)
   total_lines = count_status.map { |v| v[:n_lines] }.sum
   total_words = count_status.map { |v| v[:n_words] }.sum
   total_chars = count_status.map { |v| v[:n_chars] }.sum

@@ -19,8 +19,7 @@ def main
     end.join(' ')
     puts output
   else
-    count_status_list = read_count_status_from_files
-    display_count_status_list(count_status_list) if !count_status_list.empty?
+    display_count_status_list(count_status_list_of_files)
   end
 end
 
@@ -31,26 +30,6 @@ def count_status(input_lines)
   { n_lines:, n_words:, n_chars: }
 end
 
-def count_status_with_filename(file_path)
-  if File.directory?(file_path)
-    puts "wc: #{file_path}: Is a directory"
-    { n_lines: 0, n_words: 0, n_chars: 0, filename: file_path }
-  else
-    input_lines = []
-    file = File.open(file_path, 'r')
-    loop do
-      line = file.gets
-      break if line.nil?
-
-      input_lines << line
-    end
-    file.close
-    res = count_status(input_lines)
-    res[:filename] = file_path
-    res
-  end
-end
-
 def total_count_status(count_status)
   total_lines = count_status.map { |v| v[:n_lines] }.sum
   total_words = count_status.map { |v| v[:n_words] }.sum
@@ -58,25 +37,43 @@ def total_count_status(count_status)
   {
     n_lines: total_lines,
     n_words: total_words,
-    n_chars: total_chars,
-    filename: 'total'
+    n_chars: total_chars
   }
 end
 
-def read_count_status_from_files
+def read_files(file_path)
+  input_lines = []
+  file = File.open(file_path, 'r')
+  loop do
+    line = file.gets
+    break if line.nil?
+
+    input_lines << line
+  end
+  file.close
+  input_lines
+end
+
+def count_status_list_of_files
   count_status_list = []
   ARGV.each do |arg|
     if !File.exist?(arg)
-      puts "wc: cannot access #{arg}: No such file or directory"
+      puts "wc: #{arg}: No such file or directory"
+    elsif File.directory?(arg)
+      puts "wc: #{arg}: Is a directory"
+      count_status_list << { n_lines: 0, n_words: 0, n_chars: 0, filename: arg }
     else
-      count_status_list << count_status_with_filename(arg)
+      input_lines = read_files(arg)
+      count_status_list << { **count_status(input_lines), filename: arg }
     end
   end
-  count_status_list << total_count_status(count_status_list) if ARGV.size > 1
+  count_status_list << { **total_count_status(count_status_list), filename: 'total' } if ARGV.size > 1
   count_status_list
 end
 
 def display_count_status_list(count_status_list)
+  return if count_status_list.empty?
+
   max_width = count_status_list[0].except(:filename).keys.map do |key|
     count_status_list.map { |v| v[key].to_s.size }.max
   end.max

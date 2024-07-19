@@ -41,7 +41,7 @@ def total_count_status(count_status)
   }
 end
 
-def read_files(file_path)
+def read_file(file_path)
   input_lines = []
   file = File.open(file_path, 'r')
   loop do
@@ -63,7 +63,7 @@ def count_status_list_of_files
       puts "wc: #{arg}: Is a directory"
       count_status_list << { n_lines: 0, n_words: 0, n_chars: 0, filename: arg }
     else
-      input_lines = read_files(arg)
+      input_lines = read_file(arg)
       count_status_list << { **count_status(input_lines), filename: arg }
     end
   end

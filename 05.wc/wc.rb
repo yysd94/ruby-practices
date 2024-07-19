@@ -19,8 +19,8 @@ def main
     end.join(' ')
     puts output
   else
-    count_status_list = read_count_status_from_files
-    display_count_status_list(count_status_list) if !count_status_list.empty?
+    outputs = read_count_status_from_files
+    display_count_status_list(outputs) if !outputs.empty?
   end
 end
 
@@ -31,32 +31,7 @@ def count_status(input_lines)
   { n_lines:, n_words:, n_chars: }
 end
 
-def read_count_status_from_files
-  count_status_list = []
-  ARGV.each do |arg|
-    if !File.exist?(arg)
-      puts "wc: cannot access #{arg}: No such file or directory"
-    else
-      count_status_list << file_count_status(arg)
-    end
-  end
-  count_status_list << total_count_status(count_status_list) if ARGV.size > 1
-  count_status_list
-end
-
-def display_count_status_list(count_status_list)
-  max_width = count_status_list[0].except(:filename).keys.map do |key|
-    count_status_list.map { |v| v[key].to_s.size }.max
-  end.max
-  count_status_list.each do |output|
-    output_line = output.except(:filename).values.map do |value|
-      value.to_s.rjust(max_width)
-    end.join(' ')
-    puts "#{output_line} #{output[:filename]}"
-  end
-end
-
-def file_count_status(file_path)
+def count_status_with_filename(file_path)
   if File.directory?(file_path)
     puts "wc: #{file_path}: Is a directory"
     { n_lines: 0, n_words: 0, n_chars: 0, filename: file_path }
@@ -86,6 +61,31 @@ def total_count_status(count_status)
     n_chars: total_chars,
     filename: 'total'
   }
+end
+
+def read_count_status_from_files
+  count_status_list = []
+  ARGV.each do |arg|
+    if !File.exist?(arg)
+      puts "wc: cannot access #{arg}: No such file or directory"
+    else
+      count_status_list << count_status_with_filename(arg)
+    end
+  end
+  count_status_list << total_count_status(count_status_list) if ARGV.size > 1
+  count_status_list
+end
+
+def display_count_status_list(count_status_list)
+  max_width = count_status_list[0].except(:filename).keys.map do |key|
+    count_status_list.map { |v| v[key].to_s.size }.max
+  end.max
+  count_status_list.each do |output|
+    output_line = output.except(:filename).values.map do |value|
+      value.to_s.rjust(max_width)
+    end.join(' ')
+    puts "#{output_line} #{output[:filename]}"
+  end
 end
 
 main

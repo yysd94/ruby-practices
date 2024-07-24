@@ -17,7 +17,7 @@ def main
   column_width = MAX_COLUMN_WIDTH
   options = enabled_options(flags)
   if ARGV.empty?
-    input_lines = readlines(chomp: true)
+    input_lines = readlines
     count_status_list.append(count_status(input_lines))
   else
     count_status_list = count_status_list_of_files
@@ -37,8 +37,8 @@ end
 
 def count_status(input_lines)
   n_lines = input_lines.size
-  n_words = input_lines.map { |line| line.split(/\s+/).size }.sum
-  n_chars = input_lines.map(&:size).sum + n_lines
+  n_words = input_lines.map { |line| line.strip.split(/\s+/).size }.sum
+  n_chars = input_lines.map(&:size).sum
   { n_lines:, n_words:, n_chars: }
 end
 

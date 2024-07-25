@@ -5,13 +5,9 @@ require_relative '../lib/wc_command'
 
 class WcStdinTest < Minitest::Test
   TEST_DIR = File.expand_path('../..', __dir__)
-  LS_COMMAND_SAMPLE = 'ls -l .'
+  LS_COMMAND_SAMPLE = "ls -l #{TEST_DIR}".freeze
   FILE_PATHS = [].freeze
   STDIN_LINES = `#{LS_COMMAND_SAMPLE}`.scan(/.*?\n/)
-
-  def setup
-    Dir.chdir(TEST_DIR)
-  end
 
   def test_run_wc_with_stdin_and_no_option
     expected = `#{LS_COMMAND_SAMPLE} | wc`.chomp

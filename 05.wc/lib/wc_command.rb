@@ -64,8 +64,23 @@ def read_file(file_path)
 end
 
 def calc_column_width(counts_list, options, file_paths)
-  return MAX_COLUMN_WIDTH if file_paths.empty? || include_directory_path?(file_paths)
+  return MAX_COLUMN_WIDTH if include_directory_path?(file_paths)
+  return MAX_COLUMN_WIDTH if file_paths.empty? && options.size > 1
 
+  if options.size > 1 || file_paths.size > 1
+    max_width_of_all_options(counts_list)
+  else
+    max_width_of_display_options(counts_list, options)
+  end
+end
+
+def max_width_of_all_options(counts_list)
+  counts_list.map do |counts|
+    counts.except(:filename).values.map(&:to_s).map(&:size).max
+  end.max
+end
+
+def max_width_of_display_options(counts_list, options)
   options.map do |option|
     counts_list.map { |counts| counts[option].to_s.size }.max
   end.max
@@ -79,7 +94,7 @@ def format_counts_list_for_display(counts_list, options, column_width)
   return if counts_list.empty?
 
   counts_list_to_display = counts_list.map { |counts| counts.slice(*options, :filename) }
-  counts_list_to_display.map { |counts| format_counts_for_display(counts, column_width)}.join("\n")
+  counts_list_to_display.map { |counts| format_counts_for_display(counts, column_width) }.join("\n")
 end
 
 def format_counts_for_display(counts, column_width)
